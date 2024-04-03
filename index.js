@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import multer from 'multer'
 import mongoose from 'mongoose';
 import {registerValidation, loginValidation, postCreateValidation} from './validations.js';
@@ -12,6 +13,8 @@ mongoose
     .catch((err) => console.log('DB error/, err'))
 
 const app = express();
+
+app.use(cors());
 
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
@@ -38,7 +41,11 @@ app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
     });
 });
 
+//404 on front, cannnot get tags:
+app.get('/tags', PostController.getLastTags);
+
 app.get('/posts', PostController.getAll);
+app.get('/posts/tags', PostController.getLastTags);
 app.get('/posts/:id', PostController.getOne);
 app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
 app.delete('/posts/:id', checkAuth, PostController.remove);
